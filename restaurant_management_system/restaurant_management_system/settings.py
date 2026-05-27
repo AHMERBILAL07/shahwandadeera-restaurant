@@ -30,7 +30,7 @@ CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SECURE = not DEBUG
 
 SECURE_SSL_REDIRECT = not DEBUG
-# ─── Application Definition ───────────────────────────────────────────────────
+# Application Definition ───
 
 DJANGO_APPS = [
     'django.contrib.admin',
@@ -91,17 +91,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'restaurant_management_system.wsgi.application'
 
-# ─── Database ─────────────────────────────────────────────────────────────────
+# Database 
+
+ 
 
 DATABASES = {
-    'default': dj_database_url.config(
-        env='DATABASE_URL',
-        conn_max_age=600,
-        ssl_require=True
+    'default': dj_database_url.parse(
+        config('DATABASE_URL')
     )
 }
 
-# ─── Auth ─────────────────────────────────────────────────────────────────────
+# Auth 
 
 AUTH_USER_MODEL = 'accounts.User'
 
@@ -112,14 +112,14 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# ─── Internationalisation ─────────────────────────────────────────────────────
+# Internationalisation 
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# ─── Static & Media ───────────────────────────────────────────────────────────
+# Static & Media 
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -132,7 +132,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ─── Django REST Framework ────────────────────────────────────────────────────
+# Django REST Framework ────
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
  
@@ -156,7 +156,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-# ─── Simple JWT ───────────────────────────────────────────────────────────────
+# Simple JWT ────
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=8),
@@ -170,7 +170,7 @@ SIMPLE_JWT = {
     'USER_ID_CLAIM': 'user_id',
 }
 
-# ─── CORS ─────────────────────────────────────────────────────────────────────
+# CORS ────
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',   # React dev server
