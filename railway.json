@@ -4,6 +4,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "python manage.py migrate && gunicorn restaurant_management_system.wsgi:application"
+    "startCommand": "cd restaurant_management_system && python manage.py migrate && gunicorn restaurant_management_system.wsgi:application"
   }
 }
