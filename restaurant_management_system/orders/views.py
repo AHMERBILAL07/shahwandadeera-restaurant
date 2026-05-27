@@ -13,7 +13,11 @@ from .filters import OrderFilter
 from .models import Order, OrderStatusHistory
 from .serializers import ( OrderCreateSerializer, OrderDetailSerializer, OrderListSerializer, OrderStatusUpdateSerializer, OrderUpdateSerializer, PaymentStatusUpdateSerializer,
 )
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import (
+    MultiPartParser,
+    FormParser,
+    JSONParser,
+)
 
 class OrderViewSet(viewsets.ModelViewSet):
     """
@@ -22,12 +26,30 @@ class OrderViewSet(viewsets.ModelViewSet):
     Admin  : create, read, update, delete, filter, search
     Chef   : read + status update only (enforced in get_permissions)
     """
-    parser_classes = [MultiPartParser, FormParser]
-    
+    parser_classes = [
+        JSONParser,
+        MultiPartParser,
+        FormParser,]
+
     queryset = Order.objects.select_related(
         'created_by', 'delivered_by'
     ).prefetch_related('items__menu_item', 'status_history__changed_by').all()
+    def create(self, request, *args, **kwargs):
+        serializer = OrderCreateSerializer(data=request.data)
 
+        if serializer.is_valid():
+            serializer.save(created_by=request.user)
+
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED
+            )
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
     filter_backends  = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class  = OrderFilter
     search_fields    = ['customer_name', 'customer_phone']
@@ -142,7 +164,6 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], url_path='kitchen-queue',
             permission_classes=[IsAdminOrChef])
-    
     def kitchen_queue(self, request):
         """
         GET /api/orders/kitchen-queue/
@@ -206,3 +227,4 @@ class OrderViewSet(viewsets.ModelViewSet):
         from .serializers import OrderStatusHistorySerializer
         history = order.status_history.all()
         return Response(OrderStatusHistorySerializer(history, many=True).data)
+    
