@@ -34,22 +34,22 @@ class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.select_related(
         'created_by', 'delivered_by'
     ).prefetch_related('items__menu_item', 'status_history__changed_by').all()
-    def create(self, request, *args, **kwargs):
-    serializer = OrderCreateSerializer(
-        data=request.data,
-        context={'request': request}  
-    )
-    if serializer.is_valid():
-        serializer.save()               
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     
     filter_backends  = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class  = OrderFilter
     search_fields    = ['customer_name', 'customer_phone']
     ordering_fields  = ['created_at', 'total_price', 'status']
     ordering         = ['-created_at']
+
+    def create(self, request, *args, **kwargs):
+        serializer = OrderCreateSerializer(
+            data=request.data,
+            context={'request': request}   # ✅ pass context
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # ── Permission routing ────────────────────────────────────────────────────
 
