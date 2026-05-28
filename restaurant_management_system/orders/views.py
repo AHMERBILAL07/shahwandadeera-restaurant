@@ -35,20 +35,15 @@ class OrderViewSet(viewsets.ModelViewSet):
         'created_by', 'delivered_by'
     ).prefetch_related('items__menu_item', 'status_history__changed_by').all()
     def create(self, request, *args, **kwargs):
-        serializer = OrderCreateSerializer(data=request.data)
+    serializer = OrderCreateSerializer(
+        data=request.data,
+        context={'request': request}  
+    )
+    if serializer.is_valid():
+        serializer.save()               
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        if serializer.is_valid():
-            serializer.save(created_by=request.user)
-
-            return Response(
-                serializer.data,
-                status=status.HTTP_201_CREATED
-            )
-
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
     
     filter_backends  = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class  = OrderFilter
