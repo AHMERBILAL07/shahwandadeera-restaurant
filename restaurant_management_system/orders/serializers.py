@@ -105,18 +105,6 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             note='Order created',
         )
         return order
-    def to_internal_value(self, data):
-        data = data.copy()
-
-        items = data.get("items")
-
-        if isinstance(items, str):
-            try:
-                data.setlist("items", json.loads(items))
-            except:
-                pass
-
-        return super().to_internal_value(data)
 
 class OrderUpdateSerializer(serializers.ModelSerializer):
     """Allows updating customer info and notes on an existing order."""
